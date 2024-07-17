@@ -6,7 +6,9 @@ import { CloudIcon } from "./icons/CloudIcon";
 import axios from "axios";
 import { displayIcon } from "../Logic/IconDisplay";
 import Loading from "../Loading/Loading";
-import _ from "lodash"; 
+import _ from "lodash";
+require("dotenv").config();
+const apiKey = process.env.REACT_APP_API_KEY;
 
 const Component = () => {
   const [currentWeatherData, setCurrentWeatherData] = useState(null);
@@ -50,7 +52,6 @@ const Component = () => {
   };
 
   const fetchLocationName = (latitude, longitude, setLocation) => {
-    const apiKey = "6fa4c0e5d2ab4af1ac9b636c9426448d";
     const url = `https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&apiKey=${apiKey}`;
 
     axios
@@ -71,7 +72,6 @@ const Component = () => {
   };
 
   const fetchSuggestions = (query) => {
-    const apiKey = "6fa4c0e5d2ab4af1ac9b636c9426448d";
     const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${query}&apiKey=${apiKey}`;
 
     axios
@@ -89,14 +89,17 @@ const Component = () => {
       });
   };
 
-  const debouncedFetchSuggestions = useCallback(_.debounce(fetchSuggestions, 300), []);
+  const debouncedFetchSuggestions = useCallback(
+    _.debounce(fetchSuggestions, 300),
+    []
+  );
 
   const handleInputChange = (e) => {
     const query = e.target.value;
     setSearchInput(query);
 
     if (query.trim()) {
-      debouncedFetchSuggestions(query); 
+      debouncedFetchSuggestions(query);
     } else {
       setSuggestions([]);
     }
@@ -174,7 +177,7 @@ const Component = () => {
               placeholder="Enter a location"
               className="flex-1 bg-muted rounded-md px-4 py-2 text-sm"
               onChange={handleInputChange}
-              value={searchInput} 
+              value={searchInput}
             />
             <Button>
               <SearchIcon className="w-5 h-5" />
