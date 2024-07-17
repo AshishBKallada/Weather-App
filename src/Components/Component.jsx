@@ -7,8 +7,8 @@ import axios from "axios";
 import { displayIcon } from "../Logic/IconDisplay";
 import Loading from "../Loading/Loading";
 import _ from "lodash";
-require("dotenv").config();
-const apiKey = process.env.WEATHER_API_KEY;
+
+const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
 
 const Component = () => {
   const [currentWeatherData, setCurrentWeatherData] = useState(null);
