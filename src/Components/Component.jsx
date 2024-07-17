@@ -139,7 +139,7 @@ const Component = () => {
           </div>
           <img
             className="h-12 w-12 ml-4 rounded-full"
-            src="/src/assets/bearspin.gif"
+            src="/bearspin.gif"
             alt="Weather Icon"
           />
         </div>
