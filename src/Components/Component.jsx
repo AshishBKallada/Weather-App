@@ -8,7 +8,7 @@ import { displayIcon } from "../Logic/IconDisplay";
 import Loading from "../Loading/Loading";
 import _ from "lodash";
 
-const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
+
 
 const Component = () => {
   const [currentWeatherData, setCurrentWeatherData] = useState(null);
@@ -17,6 +17,9 @@ const Component = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [suggestions, setSuggestions] = useState([]);
+  
+  const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
+  console.log('API Key:', apiKey);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -52,6 +55,7 @@ const Component = () => {
   };
 
   const fetchLocationName = (latitude, longitude, setLocation) => {
+    const apiKey= "01547a0512cd4284b3f4b82b842d451d"
     const url = `https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&apiKey=${apiKey}`;
 
     axios
@@ -72,6 +76,7 @@ const Component = () => {
   };
 
   const fetchSuggestions = (query) => {
+   const apiKey= "01547a0512cd4284b3f4b82b842d451d"
     const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${query}&apiKey=${apiKey}`;
 
     axios
