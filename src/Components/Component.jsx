@@ -8,7 +8,7 @@ import { displayIcon } from "../Logic/IconDisplay";
 import Loading from "../Loading/Loading";
 import _ from "lodash";
 require("dotenv").config();
-const apiKey = process.env.REACT_APP_API_KEY;
+const apiKey = process.env.WEATHER_API_KEY;
 
 const Component = () => {
   const [currentWeatherData, setCurrentWeatherData] = useState(null);
