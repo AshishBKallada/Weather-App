@@ -1,14 +1,11 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Input from "./ui/input";
-import Button from "./ui/Button";
 import { SearchIcon } from "./icons/SearchIcon";
-import { CloudIcon } from "./icons/CloudIcon";
 import axios from "axios";
 import { displayIcon } from "../Logic/IconDisplay";
 import Loading from "../Loading/Loading";
 import _ from "lodash";
-
-
+import { getWeatherCondition } from "../Logic/WeatherState";
 
 const Component = () => {
   const [currentWeatherData, setCurrentWeatherData] = useState(null);
@@ -17,9 +14,9 @@ const Component = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [suggestions, setSuggestions] = useState([]);
-  
+
   const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
-  
+
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -38,7 +35,7 @@ const Component = () => {
   }, []);
 
   const fetchWeatherData = (latitude, longitude, setData) => {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m,weathercode&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m`;
 
     axios
       .get(url)
@@ -54,7 +51,7 @@ const Component = () => {
   };
 
   const fetchLocationName = (latitude, longitude, setLocation) => {
-    const apiKey= "01547a0512cd4284b3f4b82b842d451d"
+    const apiKey = "01547a0512cd4284b3f4b82b842d451d";
     const url = `https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&apiKey=${apiKey}`;
 
     axios
@@ -75,7 +72,7 @@ const Component = () => {
   };
 
   const fetchSuggestions = (query) => {
-   const apiKey= "01547a0512cd4284b3f4b82b842d451d"
+    const apiKey = "01547a0512cd4284b3f4b82b842d451d";
     const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${query}&apiKey=${apiKey}`;
 
     axios
@@ -115,7 +112,6 @@ const Component = () => {
       const [longitude, latitude] = geometry.coordinates;
       fetchWeatherData(latitude, longitude, setSearchWeatherData);
       setSearchLocation(suggestion.properties.formatted);
-
       setSuggestions([]);
     } else {
       console.error("Geometry or coordinates not found in suggestion.");
@@ -136,10 +132,10 @@ const Component = () => {
       <header className="bg-black relative bg-opacity-50 py-4 px-6 shadow">
         <div className="flex items-center">
           <div className="flex flex-col items-start">
-            <h1 className="text-2xl text-white font-bold">Weatherify</h1>
+            <h1 className="text-3xl text-white font-bold">Weatherify</h1>
             <a
               href="https://github.com/AshishBKallada"
-              className="ml-12 text-sm text-gray-300 font-cursive"
+              className="ml-12 text-lg text-gray-300 font-cursive"
             >
               AsherCode
             </a>
@@ -152,21 +148,24 @@ const Component = () => {
         </div>
       </header>
       <main className="flex-1 grid grid-cols-1 relative md:grid-cols-2 gap-8 p-8">
-        <section className="bg-black bg-opacity-50 text-white rounded-lg shadow-2xl p-6 flex flex-col items-center justify-center gap-4">
+        <section className="bg-black bg-opacity-50 text-white rounded-lg shadow-2xl p-8 flex flex-col items-center justify-center gap-4">
           {currentWeatherData && currentWeatherData.current ? (
             <>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-6">
                 {displayIcon(currentWeatherData.current.temperature_2m)}
+                <div className="text-lg font-bold">
+                  {getWeatherCondition(currentWeatherData.current.weathercode)}
+                </div>
                 <div>
-                  <div className="text-4xl font-bold">
+                  <div className="text-5xl font-bold">
                     {currentWeatherData.current.temperature_2m}°C
                   </div>
-                  <div className="text-lg text-muted-foreground">
+                  <div className="text-xl text-muted-foreground">
                     Wind Speed: {currentWeatherData.current.wind_speed_10m} km/h
                   </div>
                 </div>
               </div>
-              <div className="text-muted-foreground text-center">
+              <div className="text-muted-foreground text-center text-lg">
                 {currentLocation}
               </div>
             </>
@@ -174,25 +173,23 @@ const Component = () => {
             <Loading />
           )}
         </section>
-        <section className="bg-black bg-opacity-50 text-white rounded-lg shadow-xl p-6 flex flex-col gap-4">
-          <div className="flex items-center gap-4 w-full">
+        <section className="bg-black bg-opacity-50 text-white rounded-lg shadow-xl p-8 flex flex-col gap-4">
+          <div className="relative flex items-center gap-4 w-full">
             <Input
               type="text"
               placeholder="Enter a location"
-              className="flex-1 bg-muted rounded-md px-4 py-2 text-sm"
+              className="flex-1 bg-muted rounded-md px-4 py-3 pr-10 text-lg"
               onChange={handleInputChange}
               value={searchInput}
             />
-            <Button>
-              <SearchIcon className="w-5 h-5" />
-            </Button>
+            <SearchIcon className="absolute right-3 w-6 h-6" />
           </div>
           {suggestions.length > 0 && (
             <ul className="bg-black bg-opacity-50 rounded-md mt-2 max-h-60 overflow-auto w-full">
               {suggestions.map((suggestion) => (
                 <li
                   key={suggestion.properties.place_id}
-                  className="p-2 hover:bg-gray-700 cursor-pointer"
+                  className="p-3 hover:bg-gray-700 cursor-pointer"
                   onClick={() => handleSuggestionClick(suggestion)}
                 >
                   {suggestion.properties.formatted}
@@ -201,19 +198,30 @@ const Component = () => {
             </ul>
           )}
           <div className="flex flex-col items-center justify-center flex-1 mt-4">
-            {searchWeatherData && searchWeatherData.current && (
+            {searchWeatherData && searchWeatherData.current ? (
               <>
-                <CloudIcon className="w-12 h-12 text-blue-500" />
+                {displayIcon(searchWeatherData.current.temperature_2m)}
+                <div className="text-lg font-bold text-center">
+                  {getWeatherCondition(searchWeatherData.current.weathercode)}
+                </div>
                 <div className="text-center">
-                  <div className="text-4xl font-bold">
+                  <div className="text-5xl font-bold">
                     {searchWeatherData.current.temperature_2m}°C
                   </div>
-                  <div className="text-lg text-muted-foreground">
+                  <div className="text-xl text-muted-foreground">
                     Wind Speed: {searchWeatherData.current.wind_speed_10m} km/h
                   </div>
                 </div>
-                <p className="text-muted-foreground">{searchLocation}</p>
+                <p className="text-muted-foreground text-lg">
+                  {searchLocation}
+                </p>
+              
               </>
+            ) : (
+              <h2 className="text-lg text-muted-foreground text-center">
+               
+                Search for a location to see the weather
+              </h2>
             )}
           </div>
         </section>
