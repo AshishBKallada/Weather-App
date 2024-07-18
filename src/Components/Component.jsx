@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Input from "./ui/input";
 import { SearchIcon } from "./icons/SearchIcon";
+import { XIcon } from "./icons/XIcon"; // Assuming you have an XIcon component
 import axios from "axios";
 import { displayIcon } from "../Logic/IconDisplay";
 import Loading from "../Loading/Loading";
@@ -118,6 +119,12 @@ const Component = () => {
     }
   };
 
+  const handleClearInput = () => {
+    setSearchInput("");
+    setSearchWeatherData(null);
+    setSuggestions([]);
+  };
+
   return (
     <div className="flex flex-col h-screen bg-cover bg-center bg-gray-200">
       <video
@@ -151,22 +158,29 @@ const Component = () => {
         <section className="bg-black bg-opacity-50 text-white rounded-lg shadow-2xl p-8 flex flex-col items-center justify-center gap-4">
           {currentWeatherData && currentWeatherData.current ? (
             <>
-              <div className="flex items-center gap-6">
-                {displayIcon(currentWeatherData.current.temperature_2m)}
-                <div className="text-lg font-bold">
-                  {getWeatherCondition(currentWeatherData.current.weathercode)}
-                </div>
-                <div>
-                  <div className="text-5xl font-bold">
-                    {currentWeatherData.current.temperature_2m}°C
-                  </div>
-                  <div className="text-xl text-muted-foreground">
-                    Wind Speed: {currentWeatherData.current.wind_speed_10m} km/h
+              <div className="w-full flex flex-col items-center justify-center">
+                <div className="flex items-center">
+                  {displayIcon(currentWeatherData?.current?.weathercode)}
+                  <div className="text-lg font-bold">
+                    {getWeatherCondition(
+                      currentWeatherData?.current?.weathercode
+                    )}
                   </div>
                 </div>
-              </div>
-              <div className="text-muted-foreground text-center text-lg">
-                {currentLocation}
+                <div className="flex flex-col-1 justify-center items-center gap-6 w-full">
+                  <div>
+                    <div className="text-5xl flex items-center justify-center font-bold">
+                      {currentWeatherData.current.temperature_2m}°C
+                    </div>
+                    <div className="text-xl text-muted-foreground">
+                      Wind Speed: {currentWeatherData.current.wind_speed_10m}{" "}
+                      km/h
+                    </div>
+                  </div>
+                </div>
+                <div className="text-muted-foreground text-center text-lg">
+                  {currentLocation}
+                </div>
               </div>
             </>
           ) : (
@@ -175,14 +189,22 @@ const Component = () => {
         </section>
         <section className="bg-black bg-opacity-50 text-white rounded-lg shadow-xl p-8 flex flex-col gap-4">
           <div className="relative flex items-center gap-4 w-full">
+            <SearchIcon className="absolute left-3 w-6 h-6 text-gray-300" />
             <Input
               type="text"
               placeholder="Enter a location"
-              className="flex-1 bg-muted rounded-md px-4 py-3 pr-10 text-lg"
+              className="flex-1 bg-muted rounded-md pl-12 pr-10 py-3 text-lg"
               onChange={handleInputChange}
               value={searchInput}
             />
-            <SearchIcon className="absolute right-3 w-6 h-6" />
+            {searchInput && (
+              <button
+                onClick={handleClearInput}
+                className="absolute right-3 w-6 h-6 text-gray-500"
+              >
+                <XIcon />
+              </button>
+            )}
           </div>
           {suggestions.length > 0 && (
             <ul className="bg-black bg-opacity-50 rounded-md mt-2 max-h-60 overflow-auto w-full">
@@ -200,7 +222,7 @@ const Component = () => {
           <div className="flex flex-col items-center justify-center flex-1 mt-4">
             {searchWeatherData && searchWeatherData.current ? (
               <>
-                {displayIcon(searchWeatherData.current.temperature_2m)}
+                {displayIcon(searchWeatherData?.current?.weathercode)}
                 <div className="text-lg font-bold text-center">
                   {getWeatherCondition(searchWeatherData.current.weathercode)}
                 </div>
@@ -215,11 +237,19 @@ const Component = () => {
                 <p className="text-muted-foreground text-lg">
                   {searchLocation}
                 </p>
-              
+                <img
+                  className="h-48 w-48"
+                  src="https://media.tenor.com/LJWck697gL0AAAAi/polar-bear-bear.gif"
+                  alt=""
+                />
               </>
             ) : (
               <h2 className="text-lg text-muted-foreground text-center">
-               
+                <img
+                  className="w-56 h-56"
+                  src="https://media.tenor.com/iyOOkFq5RLQAAAAi/what-looking.gif"
+                  alt=""
+                />
                 Search for a location to see the weather
               </h2>
             )}
